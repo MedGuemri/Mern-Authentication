@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
     email : {
         type :String,
         required : true,
-        uunique : ture
+        unique : true
     },
     password :{
         type :String,
@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
     },
     name :{
         type : String,
-        required : ture
+        required : true
     },
     lastLogin :{
         type  : Date,
@@ -23,19 +23,14 @@ const userSchema = new mongoose.Schema({
         type : Boolean,
         default : false
     },
+    verificationToken : String,
+    verificationTokenExpiresAt: Date,
     resetPasswordToken : String,
     resetPasswordTokenExpiresAt : Date,
-    verificationToken : String,
-    verificationTokenExpiresAt: Date
-
-
-
-
-
-
 
 }
     ,{timestamps:true})
 
 const UserModel = mongoose.model("User", userSchema)
+
 export default UserModel

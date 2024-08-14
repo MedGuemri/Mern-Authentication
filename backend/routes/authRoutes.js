@@ -1,13 +1,22 @@
 import express from "express"
-import { logout, singin, singup } from "../controllers/authControllers.js"
+import { logout, login, singup ,verifyEmail,forgotPassword,resetPassword,checkAuth} from "../controllers/authControllers.js"
+import { verifyToken } from "../middleware/verifyToken.js"
 
 const router = express.Router()
 
-router.get("/singup",singup)
+router.get("/check-auth",verifyToken,checkAuth)
 
-router.get("/singin",singin)
+router.post("/singup",singup)
+router.post("/verify-email",verifyEmail)
 
-router.get("/logout",logout)
+
+router.post("/login",login)
+
+router.post("/logout",logout)
+
+
+router.post("/forgot-password",forgotPassword)
+router.post("/reset-password/:token",resetPassword)
 
 
 
