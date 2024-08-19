@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import SingupPage from "./pages/SingupPage";
 import LoginPage from "./pages/LoginPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
@@ -14,14 +14,13 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 
 function App() {
-  
   const { isCheckingAuth, checkAuth } = useAuthStore();
 
-	useEffect(() => {
-		checkAuth();
-	}, [checkAuth]);
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
-	if (isCheckingAuth) return <LoadingSpinner />;
+  if (isCheckingAuth) return <LoadingSpinner />;
   return (
     <div
       className="min-h-screen 
@@ -61,17 +60,18 @@ function App() {
           element={
             <RedirectAuthenticatedUser>
               <ForgotPassword />
-           </RedirectAuthenticatedUser>
+            </RedirectAuthenticatedUser>
           }
         />
         <Route
           path="/reset-password/:token"
           element={
-            //<RedirectAuthenticatedUser>
+            <RedirectAuthenticatedUser>
               <ResetPassword />
-            //</RedirectAuthenticatedUser>
+            </RedirectAuthenticatedUser>
           }
         />
+        <Route path="*" element={<Navigate to={"/"} replace />} />
       </Routes>
       <Toaster />
     </div>
