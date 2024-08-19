@@ -13,7 +13,7 @@ export const singup = async (req,res)=>{
         }
         const userAlreadyExiste = await UserModel.findOne({email})
         if (userAlreadyExiste){
-            res.status(400).json({success : false,message : "user already existe"})
+           return res.status(400).json({success : false,message : "user already existe"})
         }
 
         const hashedPassword = await bcrypt.hash(password,10)
@@ -40,7 +40,7 @@ export const singup = async (req,res)=>{
         })
 
     } catch (error) {
-        res.status(400).json({success :false , message : error.message})
+       return res.status(400).json({success :false , message : error.message})
     }
     
 
@@ -54,7 +54,7 @@ export const verifyEmail=async (req,res)=>{
         verificationTokenExpiresAt : {$gt:Date.now()}
     })
     if(!user){
-        res.status(400).json({success:false, message:"invikide or expired verification token"})
+      return  res.status(400).json({success:false, message:"invalide or expired verification token"})
     }
 
     user.isVerified =true
@@ -73,10 +73,9 @@ export const verifyEmail=async (req,res)=>{
         }
     })
     
-
    } catch (error) {
     console.log("error in very email", error)
-    res.status(500).json({success:false ,message:"sever error"})  
+    return res.status(500).json({success:false ,message:"sever error"})  
    }
 
 }
@@ -110,7 +109,7 @@ export const login = async (req,res)=>{
 
     } catch (error) {
         console.log("error in login ", error)
-        res.status(400).json({ success:false, message:error.message})
+        return  res.status(400).json({ success:false, message:error.message})
         
     }
 }
@@ -120,30 +119,31 @@ export const logout = async (req,res)=>{
 }
 
 export const forgotPassword= async (req,res)=>{
-    const {email}=req.body
-    try {
-        const user = await UserModel.findOne({email})
-        if(!user){
-            res.status(400).json({success:false, message:"user not founded"})
-        }
-        //generet rest password token
-        const resetToken = crypto.randomBytes(20).toString("hex")
-        const resetTokenExoriesAt = Date.now()+1*60*60*1000 //1 hour
+    const { email } = req.body;
+	try {
+		const user = await UserModel.findOne({ email });
 
-        user.resetPasswordToken= resetToken
-        user.resetPasswordTokenExpiresAt= resetTokenExoriesAt
-        await user.save()
+		if (!user) {
+			return res.status(400).json({ success: false, message: "User not found" });
+		}
 
-        // send reset password email
-       await  sendResetPassWordEmail(user.email,`${process.env.CLIENT_URL}/reset-password/${resetToken}`)
+		// Generate reset token
+		const resetToken = crypto.randomBytes(20).toString("hex");
+		const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000; // 1 hour
 
-       res.status(200).json({success:true ,message:"reset password link sent to your email"})
+		user.resetPasswordToken = resetToken;
+		user. resetPasswordTokenExpiresAt = resetTokenExpiresAt;
 
-    } catch (error) {
-        console.log("errorin sendeing reset password link ", error)
-        res.status(400).json({success:false,message:error.message})
-        
-    }
+		await user.save();
+
+		// send email
+		await sendResetPassWordEmail(user.email, `${process.env.CLIENT_URL}/reset-password/${resetToken}`);
+
+		res.status(200).json({ success: true, message: "Password reset link sent to your email" });
+	} catch (error) {
+		console.log("Error in forgotPassword ", error);
+        return	res.status(400).json({ success: false, message: error.message });
+	}
 }
 
 export const resetPassword=async (req,res)=>{
@@ -168,14 +168,17 @@ export const resetPassword=async (req,res)=>{
 
     } catch (error) {
         console.log("Error in resetPassword ", error);
-		res.status(400).json({ success: false, message: error.message });
+        return	res.status(400).json({ success: false, message: error.message });
     }
 }
 
 export const checkAuth =async (req,res)=>{
     try {
         const user =await UserModel.findById(req.userId).select("-password")
-        if(!user) return res.status(400).json({success : false, message:"user not found"})
+        if(!user){
+
+            return res.status(400).json({success : false, message:"user not found"})
+        } 
 
         res.status(200).json({success:true,user})
         
